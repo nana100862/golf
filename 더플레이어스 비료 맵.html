@@ -1,0 +1,671 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>더플레이어스 비료 맵</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: greenkeeper's yardage book — a year strip on top, then one schematic card per hole, filtered by month or by a single application */
+:root {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --ink: #18241d;
+  --muted: #56645b;
+  --line: #d3dccf;
+  --idle: #cfd8cb;
+  --rough: #e2e9de;
+  --green: #17734a;
+  --tee: #b26d12;
+  --fw: #5f9140;
+  --water: #2f78a8;
+  --heat: #c0502f;
+  --stripe: rgba(255,255,255,.22);
+  --accent: #17734a;
+  --sand: #e2d3a6;
+  --tree: #3f6e48;
+  --risk: #9a3a6a;
+  --font-body: "IBM Plex Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", "Hiragino Sans", "Noto Sans CJK KR", sans-serif;
+  --font-num: "Barlow Condensed", "Arial Narrow", "IBM Plex Sans KR", sans-serif;
+  color-scheme: light;
+}
+/* Always white: no dark theme, by request */
+html, body { background: #ffffff; }
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 48px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+.wrap { max-width: 1120px; margin: 0 auto; display: grid; gap: 22px; }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+.eyebrow { font-size: 12px; letter-spacing: .08em; color: var(--muted); text-transform: uppercase; }
+h1 { font-size: clamp(26px, 5vw, 38px); font-weight: 700; letter-spacing: -.01em; line-height: 1.2; }
+.lede { color: var(--muted); max-width: 62ch; margin: 6px 0 0; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px 28px; padding: 14px 0; border-block: 1px solid var(--line); }
+.stat { display: grid; gap: 0; min-width: 0; }
+.stat b { font-family: var(--font-num); font-size: 30px; font-weight: 600; line-height: 1.1; }
+.stat span { font-size: 12px; color: var(--muted); }
+section { display: grid; gap: 12px; min-width: 0; }
+h2 { font-size: 18px; font-weight: 700; }
+.sub { font-size: 13px; color: var(--muted); }
+
+/* year strip */
+.strip { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 14px 10px; display: grid; gap: 6px; }
+.lane { display: grid; grid-template-columns: 58px 1fr; align-items: center; gap: 8px; min-width: 0; }
+.lane > span { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.track { position: relative; height: 24px; border-radius: 4px; background: var(--rough); min-width: 0; }
+.track.temp { height: 46px; background: transparent; }
+.track svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.temp .heat { fill: var(--heat); opacity: .16; }
+.temp .line { fill: none; stroke: var(--ink); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.temp .zero { stroke: var(--muted); stroke-dasharray: 3 3; stroke-width: 1; vector-effect: non-scaling-stroke; }
+.temp .sel { fill: var(--accent); opacity: .10; }
+.dot { position: absolute; top: 50%; transform: translate(-50%, -50%); border-radius: 50%; border: 2px solid var(--surface);
+  padding: 0; cursor: pointer; background: var(--c); opacity: .9; }
+.dot.dim { opacity: .25; }
+.dot[aria-pressed="true"] { outline: 2px solid var(--ink); outline-offset: 1px; opacity: 1; }
+.dot:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.months { display: grid; grid-template-columns: 31fr 28fr 31fr 30fr 31fr 30fr 31fr 31fr 30fr 31fr 30fr 31fr; gap: 0; }
+.months button { font: 500 12px var(--font-body); color: var(--muted); background: none; border: 0; border-left: 1px solid var(--line);
+  padding: 4px 0; cursor: pointer; min-width: 0; }
+.months button[aria-pressed="true"] { color: var(--accent); font-weight: 700; background: var(--rough); }
+.keys { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 12px; color: var(--muted); padding-top: 4px; }
+.keys i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; background: var(--c); }
+.keys .hz { border-radius: 2px; background: var(--heat); opacity: .35; }
+
+/* toolbar */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding: 10px 0; display: flex; flex-wrap: wrap; gap: 10px; align-items: center; border-bottom: 1px solid var(--line); }
+.bar select { font: 500 14px var(--font-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.seg button { font: 500 14px var(--font-body); color: var(--ink); background: none; border: 0; padding: 7px 14px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+.bar .clear { font: 500 13px var(--font-body); color: var(--accent); background: none; border: 0; cursor: pointer; padding: 6px 4px; }
+.scope { font-size: 13px; color: var(--muted); }
+.scope b { color: var(--ink); }
+
+/* events */
+.evs { display: grid; gap: 6px; }
+.ev { display: grid; grid-template-columns: 112px 1fr auto; gap: 4px 12px; align-items: baseline; text-align: left; width: 100%;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; cursor: pointer; color: var(--ink); font: inherit; }
+.ev[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 3px 0 0 var(--c); }
+.ev .dt { font-family: var(--font-num); font-size: 16px; font-weight: 600; white-space: nowrap; }
+.ev .pr { min-width: 0; }
+.ev .pr small { color: var(--muted); }
+.ev .kg { font-family: var(--font-num); font-size: 17px; font-weight: 600; text-align: right; white-space: nowrap; }
+.ev .kg small { display: block; font-family: var(--font-body); font-size: 11px; font-weight: 400; color: var(--muted); }
+.ev .warn { grid-column: 2 / -1; font-size: 12px; color: var(--heat); }
+.pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 99px; color: var(--surface); background: var(--c); margin-right: 6px; vertical-align: 1px; }
+.empty { color: var(--muted); font-size: 14px; padding: 8px 0; }
+
+/* holes */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 12px; }
+.hole { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 8px; min-width: 0; align-content: start; }
+.hole header { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.hole .no { font-family: var(--font-num); font-size: 34px; font-weight: 700; line-height: .9; }
+.hole .meta { font-size: 13px; color: var(--muted); }
+.hole .meta b { color: var(--ink); font-weight: 600; }
+.chip { font-size: 11px; font-weight: 600; color: var(--water); border: 1px solid var(--water); border-radius: 99px; padding: 0 7px; }
+.hole svg { width: 100%; height: auto; display: block; }
+.z { fill: var(--idle); transition: fill .2s; }
+.z.on.g { fill: var(--green); } .z.on.t { fill: var(--tee); } .z.on.f { fill: var(--fw); }
+.rough { fill: var(--rough); }
+.wtr { fill: var(--water); opacity: .75; }
+.stripes { fill: url(#mow); pointer-events: none; }
+.amts { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: 13px; }
+.amts li { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: baseline; }
+.amts i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); align-self: center; }
+.amts .lb { min-width: 0; }
+.amts .v { font-family: var(--font-num); font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.tot { display: flex; justify-content: space-between; border-top: 1px solid var(--line); padding-top: 6px; font-size: 13px; color: var(--muted); }
+.tot b { font-family: var(--font-num); font-size: 18px; color: var(--ink); }
+details { font-size: 13px; }
+summary { cursor: pointer; color: var(--accent); font-weight: 600; }
+details .note { margin: 8px 0; }
+details dl { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; margin: 6px 0; }
+details dt { color: var(--muted); } details dd { margin: 0; font-family: var(--font-num); font-size: 15px; }
+.tbl { overflow-x: auto; }
+.tbl table { border-collapse: collapse; width: 100%; font-size: 12px; }
+.tbl th, .tbl td { text-align: left; padding: 3px 6px 3px 0; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tbl td.r, .tbl th.r { text-align: right; font-family: var(--font-num); font-size: 14px; }
+
+/* products + notes */
+.prods { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+.prod { border-top: 3px solid var(--c); background: var(--surface); padding: 10px 12px; border-radius: 0 0 8px 8px; font-size: 13px; display: grid; gap: 2px; }
+.prod b { font-size: 15px; } .prod .ja { color: var(--muted); }
+.notes { font-size: 13px; color: var(--muted); display: grid; gap: 6px; max-width: 80ch; }
+.notes p { margin: 0; }
+.notes a { color: var(--accent); }
+.fwp { fill: none; stroke: var(--idle); stroke-width: 20; stroke-linecap: round; stroke-linejoin: round; transition: stroke .2s; }
+.fwp.on { stroke: var(--fw); }
+.fws { fill: none; stroke: var(--stripe); stroke-width: 20; stroke-dasharray: 6 6; stroke-linejoin: round; }
+.sand { fill: var(--sand); }
+.tree { fill: var(--tree); opacity: .8; }
+.ob { stroke: var(--heat); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.raise { fill: none; stroke: var(--muted); stroke-width: 1.2; stroke-dasharray: 2 2; }
+.svgt { fill: var(--muted); font: 600 10px var(--font-body); }
+.gt { fill: var(--surface); font: 600 11px var(--font-num); }
+.obt { fill: var(--heat); font-size: 9px; }
+.feat { margin: 0; font-size: 12px; color: var(--muted); }
+.chip.risk { color: var(--risk); border-color: var(--risk); }
+.hole.atrisk { border-color: var(--risk); }
+.dzs { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.dzs .grp { font-size: 12px; color: var(--muted); margin-left: 4px; }
+.dzs button { font: 500 13px var(--font-body); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 99px; padding: 6px 12px; cursor: pointer; }
+.dzs button[aria-pressed="true"] { background: var(--risk); border-color: var(--risk); color: var(--surface); }
+.dzp { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px; display: grid; gap: 12px; min-width: 0; }
+.dzhead { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; }
+.dzhead h3 { font-size: 18px; color: var(--risk); }
+.dzhead span { font-size: 13px; color: var(--muted); }
+.dzdl { display: grid; grid-template-columns: 76px 1fr; gap: 6px 12px; margin: 0; font-size: 14px; }
+.dzdl dt { color: var(--muted); }
+.dzdl dd { margin: 0; min-width: 0; }
+.dzp h4 { margin: 0 0 6px; font-size: 14px; }
+.dzp h4 small { font-weight: 400; color: var(--muted); }
+.xps { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13px; }
+.xps .ja { color: var(--muted); }
+.rhs { display: flex; flex-wrap: wrap; gap: 6px; }
+.rh { font: 600 13px var(--font-body); color: var(--risk); background: none; border: 1px solid var(--risk); border-radius: 8px; padding: 4px 10px; cursor: pointer; }
+.rh small { font-weight: 400; color: var(--muted); }
+.riskt .band { position: absolute; top: 0; bottom: 0; background: var(--risk); opacity: .3; border-radius: 4px; }
+.dot.xtra { background: var(--surface); border: 2.5px solid var(--risk); }
+.keys .xk { background: var(--surface); border: 2px solid var(--risk); }
+.pill.add { background: var(--risk); }
+.ev .chg { grid-column: 2 / -1; font-size: 12px; color: var(--risk); }
+.ev.xev { border-style: dashed; border-color: var(--risk); }
+.ev s { color: var(--muted); }
+.scope .rk { color: var(--risk); }
+.tbl tr.xr td { color: var(--risk); }
+#h-holes, #h-dz { scroll-margin-top: 72px; }
+@media (max-width: 520px) {
+  .dzdl { grid-template-columns: 1fr; gap: 2px; }
+  .dzdl dd { margin-bottom: 6px; }
+  .ev .chg { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .ev { grid-template-columns: 1fr auto; }
+  .ev .dt { grid-column: 1 / -1; }
+  .ev .warn { grid-column: 1 / -1; }
+  .lane { grid-template-columns: 44px 1fr; }
+  .months button { font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) { .z { transition: none; } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs><pattern id="mow" width="12" height="12" patternUnits="userSpaceOnUse" patternTransform="rotate(90)">
+    <rect width="6" height="12" style="fill: var(--stripe)"></rect></pattern></defs>
+</svg>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">클럽디 더플레이어스 · 강원 춘천 · 27홀</div>
+    <h1>2027 다키 비료 맵</h1>
+    <p class="lede">월이나 시비 회차를 고르면 어느 홀의 그린·티·페어웨이에 무엇을 얼마나 줄지 홀마다 보여 줍니다. 춘천 평년 기온과 다키 잔디 시비 설계로 계산한 예측입니다.</p>
+  </header>
+
+  <div class="stats" id="stats"></div>
+
+  <section aria-labelledby="h-year">
+    <h2 id="h-year">2027 시비 달력</h2>
+    <div class="strip" id="strip"></div>
+  </section>
+
+  <div class="bar" id="bar">
+    <label class="sr" for="period" hidden>기간</label>
+    <select id="period" aria-label="기간"></select>
+    <div class="seg" id="tabs" role="group" aria-label="코스"></div>
+    <button class="clear" id="clear" type="button" hidden>회차 선택 해제</button>
+    <span class="scope" id="scope"></span>
+  </div>
+
+  <section aria-labelledby="h-dz">
+    <h2 id="h-dz">병해 대응</h2>
+    <div class="dzs" id="dzs" role="group" aria-label="병해 선택"></div>
+    <div class="dzp" id="dzp"></div>
+  </section>
+
+  <section aria-labelledby="h-ev">
+    <h2 id="h-ev">시비 회차</h2>
+    <div class="evs" id="evs"></div>
+  </section>
+
+  <section aria-labelledby="h-holes">
+    <h2 id="h-holes">홀별 매칭</h2>
+    <p class="sub" id="holes-sub"></p>
+    <div class="grid" id="holes"></div>
+  </section>
+
+  <section aria-labelledby="h-prod">
+    <h2 id="h-prod">사용 제품</h2>
+    <div class="prods" id="prods"></div>
+  </section>
+
+  <section aria-labelledby="h-xprod">
+    <h2 id="h-xprod">병해·스트레스 대응 제품 (추가 옵션)</h2>
+    <p class="sub" style="margin:0">기본 계획 밖에서 필요할 때 더하는 다키 제품입니다. 성분은 다키 카탈로그 기준이며, 수치가 확인되지 않은 제품은 라벨을 따르세요.</p>
+    <div class="prods" id="xprods"></div>
+  </section>
+
+  <section aria-labelledby="h-notes">
+    <h2 id="h-notes">계산 방법과 가정</h2>
+    <div class="notes">
+      <p>기온은 기상청 춘천 1991~2020 평년값을 일 단위 곡선으로 바꾼 값입니다. 2013~2025년 원자료는 받지 못해 평년값으로 근사했습니다. 평년보다 1℃ 더우면 고온기 입제 휴지가 6월 22일부터 시작돼 한 달 가까이 길어집니다.</p>
+      <p>그린은 벤트그래스, 티와 페어웨이는 중지로 가정했습니다. 그린 시비는 다키의 벤트그린 한지 설계(연 170 g/m² 등)를 따르고, 시작·중단은 다키 기준(최고·최저 기온)을 춘천의 큰 일교차에 맞춰 적용했습니다. 1회량은 생육지수 50%와 다키 설계 월 비중 50%로 나눴습니다.</p>
+      <p>홀 면적은 파와 블랙티 거리로 추정했습니다(그린 650~800 m², 페어웨이 폭 30 m). 물가 홀은 3 m 완충대만큼 10%, 파3 티는 디봇 회복용으로 25%를 조정했습니다. 마이크로파워V와 나이스터치는 성분을 확인하지 못했습니다. 실측 면적과 토양 검정 결과로 보정해서 쓰세요.</p>
+      <p>병해 대응은 평년 기온으로 잡은 위험기에 맞춘 예시 일정입니다. 병명은 샘플 진단으로 확인하고, 살균제는 잔디용 등록 약제를 라벨대로 쓰세요. 위험 홀은 물가·숲 그늘·솟은 그린·경사 같은 공개된 홀 특징으로 추정했습니다.</p>
+      <p>홀 도식은 블랙티 거리 비율과 라운드 후기에 나온 특징(도그레그, 물, 벙커, 숲, 오르막·내리막)으로 그린 것이며 실제 모양·축척과 다릅니다. 위쪽이 골퍼 기준 왼쪽입니다.</p>
+      <p>출처: <a href="https://www.takichem.co.jp/products/agri/hiryo/fertilizer/index.html" target="_blank" rel="noopener">다키 제품 카탈로그</a> · <a href="https://www.takichem.co.jp/products/agri/hiryo/sehi/shiba.html" target="_blank" rel="noopener">다키 잔디 시비 설계 예</a> · <a href="https://en.wikipedia.org/wiki/Chuncheon" target="_blank" rel="noopener">춘천 기후 평년값</a> · <a href="https://github.com/xteenf83/golf-scorebook" target="_blank" rel="noopener">홀별 파·거리</a> · <a href="https://9manual.com/entry/%EB%8D%94%ED%94%8C%EB%A0%88%EC%9D%B4%EC%96%B4%EC%8A%A4cc-%EB%9D%BC%EC%9A%B4%EB%93%9C-%ED%9B%84%EA%B8%B0" target="_blank" rel="noopener">코스 라운드 후기</a></p>
+    </div>
+  </section>
+</div>
+
+<script type="application/json" id="data">{"prods":["마이크로파워V","다키 유기액비 2호","마이크로커스텀","나이스터치","그린스테이지30","터프스파이스838"],"holes":[{"c":"밸리","n":1,"par":4,"dist":408,"wg":false,"wf":false,"ag":750,"at":450,"af":8940,"eg":750,"et":450,"ef":8940,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":804.6},"total":1104.7,"note":"내리막 티샷·우측 OB. 경사면이라 강우 직전 시비 금지."},{"c":"밸리","n":2,"par":4,"dist":352,"wg":false,"wf":true,"ag":750,"at":450,"af":7260,"eg":750,"et":450,"ef":6534,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":588.1},"total":888.1,"note":"세컨드 지점을 개울이 가로지름 → 개울 양쪽 3m 완충대 무시비, 드롭 스프레더 사용."},{"c":"밸리","n":3,"par":5,"dist":483,"wg":true,"wf":false,"ag":800,"at":400,"af":11190,"eg":720,"et":400,"ef":11190,"annual":{"마이크로파워V":122.5,"다키 유기액비 2호":28.8,"마이크로커스텀":69.6,"나이스터치":14.4,"그린스테이지30":48,"터프스파이스838":1007.1},"total":1290.4,"note":"그린 좌측 개울 → 그린 가장자리 3m 완충대, 액비는 개울 쪽으로 분무 금지."},{"c":"밸리","n":4,"par":3,"dist":180,"wg":false,"wf":false,"ag":650,"at":600,"af":300,"eg":650,"et":750,"ef":300,"annual":{"마이크로파워V":110.6,"다키 유기액비 2호":26,"마이크로커스텀":74.5,"나이스터치":13,"그린스테이지30":90,"터프스파이스838":27},"total":341.1,"note":"파3 — 티 디봇 보정 적용."},{"c":"밸리","n":5,"par":5,"dist":513,"wg":false,"wf":false,"ag":800,"at":400,"af":12090,"eg":800,"et":400,"ef":12090,"annual":{"마이크로파워V":136.1,"다키 유기액비 2호":32,"마이크로커스텀":76,"나이스터치":16,"그린스테이지30":48,"터프스파이스838":1088.1},"total":1396.2,"note":"오르막 홀. 표준 관리."},{"c":"밸리","n":6,"par":4,"dist":396,"wg":false,"wf":false,"ag":750,"at":450,"af":8580,"eg":750,"et":450,"ef":8580,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":772.2},"total":1072.3,"note":"내리막 티샷·세컨드 이후 내리막 → 경사면은 1회량을 2회로 나눠 시비 권장."},{"c":"밸리","n":7,"par":3,"dist":188,"wg":false,"wf":false,"ag":650,"at":600,"af":300,"eg":650,"et":750,"ef":300,"annual":{"마이크로파워V":110.6,"다키 유기액비 2호":26,"마이크로커스텀":74.5,"나이스터치":13,"그린스테이지30":90,"터프스파이스838":27},"total":341.1,"note":"파3, 그린이 좌측으로 기욺 → 높은 쪽 건조·낮은 쪽 과습 주의, 액비 균일 살포."},{"c":"밸리","n":8,"par":4,"dist":352,"wg":false,"wf":false,"ag":750,"at":450,"af":7260,"eg":750,"et":450,"ef":7260,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":653.4},"total":953.5,"note":"특이사항 없음."},{"c":"밸리","n":9,"par":4,"dist":381,"wg":false,"wf":false,"ag":750,"at":450,"af":8130,"eg":750,"et":450,"ef":8130,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":731.7},"total":1031.8,"note":"특이사항 없음."},{"c":"레이크","n":1,"par":4,"dist":399,"wg":false,"wf":false,"ag":750,"at":450,"af":8670,"eg":750,"et":450,"ef":8670,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":780.3},"total":1080.4,"note":"내리막·우측 OB. 경사면이라 강우 직전 시비 금지."},{"c":"레이크","n":2,"par":4,"dist":330,"wg":false,"wf":false,"ag":750,"at":450,"af":6600,"eg":750,"et":450,"ef":6600,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":594},"total":894.1,"note":"짧은 파4. 표준 관리."},{"c":"레이크","n":3,"par":3,"dist":200,"wg":false,"wf":false,"ag":650,"at":600,"af":300,"eg":650,"et":750,"ef":300,"annual":{"마이크로파워V":110.6,"다키 유기액비 2호":26,"마이크로커스텀":74.5,"나이스터치":13,"그린스테이지30":90,"터프스파이스838":27},"total":341.1,"note":"파3 — 티 디봇 보정 적용."},{"c":"레이크","n":4,"par":4,"dist":381,"wg":false,"wf":true,"ag":750,"at":450,"af":8130,"eg":750,"et":450,"ef":7317,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":658.5},"total":958.6,"note":"티샷 약 240m 지점 페널티 구역(물) → 페어웨이 물가 3m 완충대."},{"c":"레이크","n":5,"par":4,"dist":363,"wg":false,"wf":false,"ag":750,"at":450,"af":7590,"eg":750,"et":450,"ef":7590,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":683.1},"total":983.2,"note":"페어웨이가 좌측으로 기욺 → 낮은 쪽에 비료 쏠림 주의, 살포 방향 조정."},{"c":"레이크","n":6,"par":4,"dist":396,"wg":false,"wf":false,"ag":750,"at":450,"af":8580,"eg":750,"et":450,"ef":8580,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":772.2},"total":1072.3,"note":"좌측 능선. 표준 관리."},{"c":"레이크","n":7,"par":5,"dist":493,"wg":false,"wf":false,"ag":800,"at":400,"af":11490,"eg":800,"et":400,"ef":11490,"annual":{"마이크로파워V":136.1,"다키 유기액비 2호":32,"마이크로커스텀":76,"나이스터치":16,"그린스테이지30":48,"터프스파이스838":1034.1},"total":1342.2,"note":"우측 벙커. 파5(코스공략도 기준). 표준 관리."},{"c":"레이크","n":8,"par":3,"dist":181,"wg":false,"wf":false,"ag":650,"at":600,"af":300,"eg":650,"et":750,"ef":300,"annual":{"마이크로파워V":110.6,"다키 유기액비 2호":26,"마이크로커스텀":74.5,"나이스터치":13,"그린스테이지30":90,"터프스파이스838":27},"total":341.1,"note":"파3 — 티 디봇 보정 적용."},{"c":"레이크","n":9,"par":5,"dist":519,"wg":true,"wf":false,"ag":800,"at":400,"af":12270,"eg":720,"et":400,"ef":12270,"annual":{"마이크로파워V":122.5,"다키 유기액비 2호":28.8,"마이크로커스텀":69.6,"나이스터치":14.4,"그린스테이지30":48,"터프스파이스838":1104.3},"total":1387.6,"note":"물에 둘러싸인 그린(아일랜드형) → 그린 계수 적용, 가장자리 3m 시비 금지, 장마기 시비 연기."},{"c":"마운틴","n":1,"par":4,"dist":344,"wg":false,"wf":false,"ag":750,"at":450,"af":7020,"eg":750,"et":450,"ef":7020,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":631.8},"total":931.9,"note":"솟은 그린 → 건조가 빨라 액비 후 관수 병행."},{"c":"마운틴","n":2,"par":3,"dist":170,"wg":false,"wf":false,"ag":650,"at":600,"af":300,"eg":650,"et":750,"ef":300,"annual":{"마이크로파워V":110.6,"다키 유기액비 2호":26,"마이크로커스텀":74.5,"나이스터치":13,"그린스테이지30":90,"터프스파이스838":27},"total":341.1,"note":"내리막 파3 — 티 디봇 보정 적용."},{"c":"마운틴","n":3,"par":5,"dist":504,"wg":false,"wf":false,"ag":800,"at":400,"af":11820,"eg":800,"et":400,"ef":11820,"annual":{"마이크로파워V":136.1,"다키 유기액비 2호":32,"마이크로커스텀":76,"나이스터치":16,"그린스테이지30":48,"터프스파이스838":1063.8},"total":1371.9,"note":"중간에 페어웨이 단절·그린까지 오르막 → 경사면 분할 시비."},{"c":"마운틴","n":4,"par":4,"dist":380,"wg":false,"wf":false,"ag":750,"at":450,"af":8100,"eg":750,"et":450,"ef":8100,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":729},"total":1029.1,"note":"L자 도그레그, 그린 뒤 내리막."},{"c":"마운틴","n":5,"par":3,"dist":195,"wg":false,"wf":false,"ag":650,"at":600,"af":300,"eg":650,"et":750,"ef":300,"annual":{"마이크로파워V":110.6,"다키 유기액비 2호":26,"마이크로커스텀":74.5,"나이스터치":13,"그린스테이지30":90,"터프스파이스838":27},"total":341.1,"note":"파3 — 티 디봇 보정 적용."},{"c":"마운틴","n":6,"par":4,"dist":368,"wg":false,"wf":false,"ag":750,"at":450,"af":7740,"eg":750,"et":450,"ef":7740,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":696.6},"total":996.7,"note":"내리막 티. 표준 관리."},{"c":"마운틴","n":7,"par":5,"dist":537,"wg":true,"wf":false,"ag":800,"at":400,"af":12810,"eg":720,"et":400,"ef":12810,"annual":{"마이크로파워V":122.5,"다키 유기액비 2호":28.8,"마이크로커스텀":69.6,"나이스터치":14.4,"그린스테이지30":48,"터프스파이스838":1152.9},"total":1436.2,"note":"그린 앞 연못·우측 숲 → 그린 물가 계수 적용. 그늘이 길면 질소 추가 감량 검토."},{"c":"마운틴","n":8,"par":4,"dist":355,"wg":false,"wf":false,"ag":750,"at":450,"af":7350,"eg":750,"et":450,"ef":7350,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":661.5},"total":961.6,"note":"그린까지 오르막, 벙커 밀집 구역."},{"c":"마운틴","n":9,"par":4,"dist":391,"wg":false,"wf":false,"ag":750,"at":450,"af":8430,"eg":750,"et":450,"ef":8430,"annual":{"마이크로파워V":127.6,"다키 유기액비 2호":30,"마이크로커스텀":73.5,"나이스터치":15,"그린스테이지30":54,"터프스파이스838":758.7},"total":1058.8,"note":"좌 도그레그, 좌경사 라이 → 낮은 쪽 비료 쏠림 주의."}],"events":[{"d":"2027-03-15","z":"그린","p":"나이스터치","ja":"ナイスタッチ","spec":"미확인 (현행 카탈로그 미수록)","rate":10,"kg":197.1,"bags":9.9,"how":"다키 설계 품목 — 구입 가능 여부 대리점 확인","warn":"저온기 시비","per":[7.5,7.5,7.2,6.5,8,7.5,6.5,7.5,7.5,7.5,7.5,6.5,7.5,7.5,7.5,8,6.5,7.2,7.5,6.5,8,7.5,6.5,7.5,7.2,7.5,7.5]},{"d":"2027-04-17","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":19.6,"kg":386.3,"bags":19.3,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[14.7,14.7,14.112,12.74,15.68,14.7,12.74,14.7,14.7,14.7,14.7,12.74,14.7,14.7,14.7,15.68,12.74,14.112,14.7,12.74,15.68,14.7,12.74,14.7,14.112,14.7,14.7]},{"d":"2027-04-24","z":"그린","p":"마이크로커스텀","ja":"マイクロカスタム","spec":"0-15-15-5 (추정)","rate":40,"kg":788.4,"bags":39.4,"how":"입제 살포 후 관수","warn":"","per":[30,30,28.8,26,32,30,26,30,30,30,30,26,30,30,30,32,26,28.8,30,26,32,30,26,30,28.8,30,30]},{"d":"2027-05-01","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":12.3,"kg":242.4,"bags":12.1,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[9.225,9.225,8.856,7.995,9.84,9.225,7.995,9.225,9.225,9.225,9.225,7.995,9.225,9.225,9.225,9.84,7.995,8.856,9.225,7.995,9.84,9.225,7.995,9.225,8.856,9.225,9.225]},{"d":"2027-05-02","z":"티","p":"그린스테이지30","ja":"グリーンステージ30","spec":"10-10-10-2, Mn 0.5","rate":12,"kg":163.8,"bags":8.2,"how":"세립 입제, 관수로 녹임","warn":"","per":[5.4,5.4,4.8,9,4.8,5.4,9,5.4,5.4,5.4,5.4,9,5.4,5.4,5.4,4.8,9,4.8,5.4,9,4.8,5.4,9,5.4,4.8,5.4,5.4]},{"d":"2027-05-08","z":"그린","p":"다키 유기액비 2호","ja":"多木有機液肥2号","spec":"8-3-5 (아미노산 약 6%)","rate":10,"kg":197.1,"bags":9.9,"how":"50배 이상 희석, 100~200 cc/m² 분무","warn":"","per":[7.5,7.5,7.2,6.5,8,7.5,6.5,7.5,7.5,7.5,7.5,6.5,7.5,7.5,7.5,8,6.5,7.2,7.5,6.5,8,7.5,6.5,7.5,7.2,7.5,7.5]},{"d":"2027-05-15","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":13.9,"kg":274.0,"bags":13.7,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[10.425,10.425,10.008,9.035,11.12,10.425,9.035,10.425,10.425,10.425,10.425,9.035,10.425,10.425,10.425,11.12,9.035,10.008,10.425,9.035,11.12,10.425,9.035,10.425,10.008,10.425,10.425]},{"d":"2027-05-23","z":"티","p":"그린스테이지30","ja":"グリーンステージ30","spec":"10-10-10-2, Mn 0.5","rate":15.3,"kg":208.8,"bags":10.4,"how":"세립 입제, 관수로 녹임","warn":"","per":[6.885,6.885,6.12,11.475,6.12,6.885,11.475,6.885,6.885,6.885,6.885,11.475,6.885,6.885,6.885,6.12,11.475,6.12,6.885,11.475,6.12,6.885,11.475,6.885,6.12,6.885,6.885]},{"d":"2027-05-29","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":14.1,"kg":277.9,"bags":13.9,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[10.575,10.575,10.152,9.165,11.28,10.575,9.165,10.575,10.575,10.575,10.575,9.165,10.575,10.575,10.575,11.28,9.165,10.152,10.575,9.165,11.28,10.575,9.165,10.575,10.152,10.575,10.575]},{"d":"2027-05-29","z":"그린","p":"다키 유기액비 2호","ja":"多木有機液肥2号","spec":"8-3-5 (아미노산 약 6%)","rate":10,"kg":197.1,"bags":9.9,"how":"50배 이상 희석, 100~200 cc/m² 분무","warn":"","per":[7.5,7.5,7.2,6.5,8,7.5,6.5,7.5,7.5,7.5,7.5,6.5,7.5,7.5,7.5,8,6.5,7.2,7.5,6.5,8,7.5,6.5,7.5,7.2,7.5,7.5]},{"d":"2027-06-05","z":"페어웨이","p":"터프스파이스838","ja":"ターフスパイス838","spec":"8-3-8, 유기 40%","rate":30,"kg":5709.3,"bags":285.5,"how":"브리켓 입제, 관수 시 붕괴","warn":"","per":[268.2,196.02,335.7,9,362.7,257.4,9,217.8,243.9,260.1,198,9,219.51,227.7,257.4,344.7,9,368.1,210.6,9,354.6,243,9,232.2,384.3,220.5,252.9]},{"d":"2027-06-12","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":15.8,"kg":311.4,"bags":15.6,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[11.85,11.85,11.376,10.27,12.64,11.85,10.27,11.85,11.85,11.85,11.85,10.27,11.85,11.85,11.85,12.64,10.27,11.376,11.85,10.27,12.64,11.85,10.27,11.85,11.376,11.85,11.85]},{"d":"2027-06-13","z":"티","p":"그린스테이지30","ja":"グリーンステージ30","spec":"10-10-10-2, Mn 0.5","rate":18.9,"kg":258.0,"bags":12.9,"how":"세립 입제, 관수로 녹임","warn":"","per":[8.505,8.505,7.56,14.175,7.56,8.505,14.175,8.505,8.505,8.505,8.505,14.175,8.505,8.505,8.505,7.56,14.175,7.56,8.505,14.175,7.56,8.505,14.175,8.505,7.56,8.505,8.505]},{"d":"2027-06-26","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":14.6,"kg":287.8,"bags":14.4,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"장마기: 집중호우 예보 시 연기","per":[10.95,10.95,10.512,9.49,11.68,10.95,9.49,10.95,10.95,10.95,10.95,9.49,10.95,10.95,10.95,11.68,9.49,10.512,10.95,9.49,11.68,10.95,9.49,10.95,10.512,10.95,10.95]},{"d":"2027-07-04","z":"티","p":"그린스테이지30","ja":"グリーンステージ30","spec":"10-10-10-2, Mn 0.5","rate":16.9,"kg":230.7,"bags":11.5,"how":"세립 입제, 관수로 녹임","warn":"장마기: 집중호우 예보 시 연기","per":[7.605,7.605,6.76,12.675,6.76,7.605,12.675,7.605,7.605,7.605,7.605,12.675,7.605,7.605,7.605,6.76,12.675,6.76,7.605,12.675,6.76,7.605,12.675,7.605,6.76,7.605,7.605]},{"d":"2027-07-10","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":16.2,"kg":319.3,"bags":16.0,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"장마기: 집중호우 예보 시 연기","per":[12.15,12.15,11.664,10.53,12.96,12.15,10.53,12.15,12.15,12.15,12.15,10.53,12.15,12.15,12.15,12.96,10.53,11.664,12.15,10.53,12.96,12.15,10.53,12.15,11.664,12.15,12.15]},{"d":"2027-07-23","z":"페어웨이","p":"터프스파이스838","ja":"ターフスパイス838","spec":"8-3-8, 유기 40%","rate":30,"kg":5709.3,"bags":285.5,"how":"브리켓 입제, 관수 시 붕괴","warn":"장마기: 집중호우 예보 시 연기 / 고온기: 이른 아침 살포 후 관수","per":[268.2,196.02,335.7,9,362.7,257.4,9,217.8,243.9,260.1,198,9,219.51,227.7,257.4,344.7,9,368.1,210.6,9,354.6,243,9,232.2,384.3,220.5,252.9]},{"d":"2027-07-25","z":"티","p":"그린스테이지30","ja":"グリーンステージ30","spec":"10-10-10-2, Mn 0.5","rate":17.8,"kg":243.0,"bags":12.1,"how":"세립 입제, 관수로 녹임","warn":"장마기: 집중호우 예보 시 연기 / 고온기: 이른 아침 살포 후 관수","per":[8.01,8.01,7.12,13.35,7.12,8.01,13.35,8.01,8.01,8.01,8.01,13.35,8.01,8.01,8.01,7.12,13.35,7.12,8.01,13.35,7.12,8.01,13.35,8.01,7.12,8.01,8.01]},{"d":"2027-08-05","z":"그린","p":"다키 유기액비 2호","ja":"多木有機液肥2号","spec":"8-3-5 (아미노산 약 6%)","rate":10,"kg":197.1,"bags":9.9,"how":"50배 이상 희석, 100~200 cc/m² 분무","warn":"고온기: 이른 아침, 희석 배수 높게","per":[7.5,7.5,7.2,6.5,8,7.5,6.5,7.5,7.5,7.5,7.5,6.5,7.5,7.5,7.5,8,6.5,7.2,7.5,6.5,8,7.5,6.5,7.5,7.2,7.5,7.5]},{"d":"2027-08-15","z":"티","p":"그린스테이지30","ja":"グリーンステージ30","spec":"10-10-10-2, Mn 0.5","rate":20,"kg":273,"bags":13.7,"how":"세립 입제, 관수로 녹임","warn":"고온기: 이른 아침 살포 후 관수","per":[9,9,8,15,8,9,15,9,9,9,9,15,9,9,9,8,15,8,9,15,8,9,15,9,8,9,9]},{"d":"2027-08-21","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":7.6,"kg":149.8,"bags":7.5,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[5.7,5.7,5.472,4.94,6.08,5.7,4.94,5.7,5.7,5.7,5.7,4.94,5.7,5.7,5.7,6.08,4.94,5.472,5.7,4.94,6.08,5.7,4.94,5.7,5.472,5.7,5.7]},{"d":"2027-08-27","z":"페어웨이","p":"터프스파이스838","ja":"ターフスパイス838","spec":"8-3-8, 유기 40%","rate":30,"kg":5709.3,"bags":285.5,"how":"브리켓 입제, 관수 시 붕괴","warn":"","per":[268.2,196.02,335.7,9,362.7,257.4,9,217.8,243.9,260.1,198,9,219.51,227.7,257.4,344.7,9,368.1,210.6,9,354.6,243,9,232.2,384.3,220.5,252.9]},{"d":"2027-09-04","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":16.6,"kg":327.2,"bags":16.4,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[12.45,12.45,11.952,10.79,13.28,12.45,10.79,12.45,12.45,12.45,12.45,10.79,12.45,12.45,12.45,13.28,10.79,11.952,12.45,10.79,13.28,12.45,10.79,12.45,11.952,12.45,12.45]},{"d":"2027-09-05","z":"티","p":"그린스테이지30","ja":"グリーンステージ30","spec":"10-10-10-2, Mn 0.5","rate":11.4,"kg":155.6,"bags":7.8,"how":"세립 입제, 관수로 녹임","warn":"","per":[5.13,5.13,4.56,8.55,4.56,5.13,8.55,5.13,5.13,5.13,5.13,8.55,5.13,5.13,5.13,4.56,8.55,4.56,5.13,8.55,4.56,5.13,8.55,5.13,4.56,5.13,5.13]},{"d":"2027-09-13","z":"그린","p":"마이크로커스텀","ja":"マイクロカスタム","spec":"0-15-15-5 (추정)","rate":40,"kg":788.4,"bags":39.4,"how":"입제 살포 후 관수","warn":"","per":[30,30,28.8,26,32,30,26,30,30,30,30,26,30,30,30,32,26,28.8,30,26,32,30,26,30,28.8,30,30]},{"d":"2027-09-15","z":"티","p":"마이크로커스텀","ja":"マイクロカスタム","spec":"0-15-15-5 (추정)","rate":30,"kg":409.5,"bags":20.5,"how":"입제 살포 후 관수","warn":"","per":[13.5,13.5,12,22.5,12,13.5,22.5,13.5,13.5,13.5,13.5,22.5,13.5,13.5,13.5,12,22.5,12,13.5,22.5,12,13.5,22.5,13.5,12,13.5,13.5]},{"d":"2027-09-18","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":15.8,"kg":311.4,"bags":15.6,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[11.85,11.85,11.376,10.27,12.64,11.85,10.27,11.85,11.85,11.85,11.85,10.27,11.85,11.85,11.85,12.64,10.27,11.376,11.85,10.27,12.64,11.85,10.27,11.85,11.376,11.85,11.85]},{"d":"2027-09-20","z":"그린","p":"다키 유기액비 2호","ja":"多木有機液肥2号","spec":"8-3-5 (아미노산 약 6%)","rate":10,"kg":197.1,"bags":9.9,"how":"50배 이상 희석, 100~200 cc/m² 분무","warn":"","per":[7.5,7.5,7.2,6.5,8,7.5,6.5,7.5,7.5,7.5,7.5,6.5,7.5,7.5,7.5,8,6.5,7.2,7.5,6.5,8,7.5,6.5,7.5,7.2,7.5,7.5]},{"d":"2027-09-26","z":"티","p":"그린스테이지30","ja":"グリーンステージ30","spec":"10-10-10-2, Mn 0.5","rate":7.7,"kg":105.1,"bags":5.3,"how":"세립 입제, 관수로 녹임","warn":"","per":[3.465,3.465,3.08,5.775,3.08,3.465,5.775,3.465,3.465,3.465,3.465,5.775,3.465,3.465,3.465,3.08,5.775,3.08,3.465,5.775,3.08,3.465,5.775,3.465,3.08,3.465,3.465]},{"d":"2027-10-02","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":10.4,"kg":205.0,"bags":10.2,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[7.8,7.8,7.488,6.76,8.32,7.8,6.76,7.8,7.8,7.8,7.8,6.76,7.8,7.8,7.8,8.32,6.76,7.488,7.8,6.76,8.32,7.8,6.76,7.8,7.488,7.8,7.8]},{"d":"2027-10-16","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":7.4,"kg":145.9,"bags":7.3,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[5.55,5.55,5.328,4.81,5.92,5.55,4.81,5.55,5.55,5.55,5.55,4.81,5.55,5.55,5.55,5.92,4.81,5.328,5.55,4.81,5.92,5.55,4.81,5.55,5.328,5.55,5.55]},{"d":"2027-10-30","z":"그린","p":"마이크로파워V","ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)","rate":5.8,"kg":114.3,"bags":5.7,"how":"세립 입제, 드롭/로터리 살포기 → 가벼운 관수","warn":"","per":[4.35,4.35,4.176,3.77,4.64,4.35,3.77,4.35,4.35,4.35,4.35,3.77,4.35,4.35,4.35,4.64,3.77,4.176,4.35,3.77,4.64,4.35,3.77,4.35,4.176,4.35,4.35]},{"d":"2027-11-25","z":"그린","p":"나이스터치","ja":"ナイスタッチ","spec":"미확인 (현행 카탈로그 미수록)","rate":10,"kg":197.1,"bags":9.9,"how":"다키 설계 품목 — 구입 가능 여부 대리점 확인","warn":"저온기 시비","per":[7.5,7.5,7.2,6.5,8,7.5,6.5,7.5,7.5,7.5,7.5,6.5,7.5,7.5,7.5,8,6.5,7.2,7.5,6.5,8,7.5,6.5,7.5,7.2,7.5,7.5]}],"temps":{"tmax":[1.8,1.8,1.8,1.7,1.7,1.7,1.7,1.7,1.7,1.7,1.8,1.8,1.8,1.9,1.9,1.9,2,2.1,2.1,2.2,2.2,2.3,2.4,2.5,2.6,2.7,2.7,2.8,3,3.1,3.2,3.3,3.4,3.5,3.7,3.8,3.9,4.1,4.2,4.4,4.6,4.7,4.9,5,5.2,5.4,5.6,5.8,6,6.2,6.4,6.6,6.8,7,7.2,7.4,7.6,7.8,8.1,8.3,8.5,8.7,9,9.2,9.4,9.7,9.9,10.1,10.4,10.6,10.9,11.1,11.4,11.6,11.8,12.1,12.3,12.6,12.8,13.1,13.3,13.6,13.8,14.1,14.3,14.5,14.8,15,15.3,15.5,15.7,16,16.2,16.4,16.7,16.9,17.1,17.4,17.6,17.8,18,18.3,18.5,18.7,18.9,19.1,19.3,19.5,19.7,19.9,20.1,20.3,20.5,20.7,20.9,21.1,21.3,21.4,21.6,21.8,22,22.2,22.3,22.5,22.7,22.8,23,23.2,23.3,23.5,23.7,23.8,24,24.1,24.3,24.5,24.6,24.8,24.9,25.1,25.2,25.4,25.5,25.6,25.8,25.9,26.1,26.2,26.3,26.5,26.6,26.7,26.8,27,27.1,27.2,27.3,27.4,27.5,27.6,27.7,27.8,27.9,27.9,28,28.1,28.2,28.2,28.3,28.4,28.4,28.5,28.5,28.6,28.6,28.6,28.7,28.7,28.8,28.8,28.8,28.9,28.9,28.9,28.9,29,29,29,29.1,29.1,29.1,29.2,29.2,29.2,29.3,29.3,29.3,29.4,29.4,29.5,29.5,29.6,29.6,29.7,29.7,29.7,29.8,29.8,29.9,29.9,29.9,30,30,30,30.1,30.1,30.1,30.1,30.1,30.1,30.1,30.1,30.1,30,30,29.9,29.9,29.8,29.8,29.7,29.6,29.5,29.4,29.3,29.2,29.1,29,28.9,28.7,28.6,28.5,28.3,28.2,28,27.9,27.7,27.5,27.4,27.2,27,26.9,26.7,26.5,26.3,26.1,26,25.8,25.6,25.4,25.2,25.1,24.9,24.7,24.5,24.3,24.1,23.9,23.8,23.6,23.4,23.2,23,22.8,22.6,22.4,22.2,22,21.8,21.6,21.4,21.2,20.9,20.7,20.5,20.3,20.1,19.8,19.6,19.4,19.1,18.9,18.6,18.4,18.1,17.9,17.6,17.4,17.1,16.9,16.6,16.3,16,15.8,15.5,15.2,14.9,14.7,14.4,14.1,13.8,13.5,13.2,13,12.7,12.4,12.1,11.8,11.5,11.2,10.9,10.6,10.3,10,9.7,9.4,9.1,8.8,8.6,8.3,8,7.7,7.4,7.1,6.9,6.6,6.3,6.1,5.8,5.6,5.4,5.1,4.9,4.7,4.5,4.2,4,3.9,3.7,3.5,3.3,3.2,3,2.9,2.8,2.6,2.5,2.4,2.3,2.2,2.2,2.1,2,2,1.9,1.9],"tmean":[-3.9,-4,-4,-4,-4.1,-4.1,-4.1,-4.1,-4.2,-4.2,-4.2,-4.2,-4.1,-4.1,-4.1,-4.1,-4,-4,-4,-3.9,-3.9,-3.8,-3.7,-3.7,-3.6,-3.5,-3.5,-3.4,-3.3,-3.2,-3.1,-3,-2.9,-2.8,-2.6,-2.5,-2.4,-2.2,-2.1,-2,-1.8,-1.7,-1.5,-1.3,-1.2,-1,-0.8,-0.6,-0.5,-0.3,-0.1,0.1,0.3,0.5,0.7,0.9,1.2,1.4,1.6,1.8,2,2.3,2.5,2.7,2.9,3.2,3.4,3.6,3.9,4.1,4.3,4.5,4.8,5,5.2,5.5,5.7,5.9,6.1,6.3,6.6,6.8,7,7.2,7.4,7.7,7.9,8.1,8.3,8.5,8.7,9,9.2,9.4,9.6,9.8,10,10.2,10.4,10.7,10.9,11.1,11.3,11.5,11.7,11.9,12.1,12.3,12.5,12.7,12.9,13.1,13.4,13.6,13.8,14,14.2,14.4,14.6,14.8,15,15.2,15.4,15.6,15.7,15.9,16.1,16.3,16.5,16.7,16.9,17.1,17.2,17.4,17.6,17.8,18,18.1,18.3,18.5,18.6,18.8,19,19.1,19.3,19.4,19.6,19.7,19.9,20.1,20.2,20.3,20.5,20.6,20.8,20.9,21.1,21.2,21.3,21.5,21.6,21.7,21.8,22,22.1,22.2,22.3,22.4,22.5,22.7,22.8,22.9,23,23.1,23.2,23.3,23.4,23.5,23.6,23.7,23.8,23.9,23.9,24,24.1,24.2,24.3,24.3,24.4,24.5,24.6,24.6,24.7,24.8,24.8,24.9,25,25,25.1,25.1,25.2,25.2,25.3,25.3,25.4,25.4,25.4,25.4,25.5,25.5,25.5,25.5,25.5,25.5,25.5,25.5,25.5,25.5,25.4,25.4,25.4,25.3,25.3,25.2,25.2,25.1,25,24.9,24.8,24.7,24.6,24.5,24.4,24.3,24.1,24,23.8,23.7,23.5,23.4,23.2,23,22.9,22.7,22.5,22.3,22.1,21.9,21.7,21.5,21.3,21.1,20.9,20.7,20.5,20.2,20,19.8,19.6,19.3,19.1,18.9,18.7,18.4,18.2,18,17.7,17.5,17.3,17,16.8,16.5,16.3,16.1,15.8,15.6,15.3,15.1,14.9,14.6,14.4,14.1,13.9,13.7,13.4,13.2,12.9,12.7,12.5,12.2,12,11.8,11.5,11.3,11.1,10.8,10.6,10.4,10.1,9.9,9.7,9.4,9.2,9,8.7,8.5,8.3,8,7.8,7.5,7.3,7.1,6.8,6.6,6.3,6.1,5.8,5.6,5.3,5,4.8,4.5,4.2,4,3.7,3.4,3.2,2.9,2.6,2.4,2.1,1.9,1.6,1.3,1.1,0.8,0.6,0.3,0.1,-0.1,-0.4,-0.6,-0.8,-1,-1.2,-1.4,-1.6,-1.8,-2,-2.2,-2.3,-2.5,-2.6,-2.8,-2.9,-3,-3.2,-3.3,-3.4,-3.5,-3.6,-3.6,-3.7,-3.8,-3.9]},"ms":{"그린 시비 시작 (최고≥15℃·최저≥5℃)":"2027-04-17","고온기 입제 휴지 시작 (최고≥29.5℃)":"2027-07-20","고온기 입제 휴지 끝":"2027-08-20","그린 입제 중단 (최고<12.5℃·최저<5℃)":"2027-11-11","중지(티) 생육기 시작 (평균≥15℃)":"2027-05-02","중지(티) 생육기 끝":"2027-10-06","페어웨이 시비창 시작 (난지형 GP≥0.35)":"2027-06-05","페어웨이 시비창 끝":"2027-09-10"},"spec":{"마이크로파워V":{"ja":"マイクロパワーV","spec":"성분 미확인 (マイクロパワー 시리즈 5-5-5-1 / 8-8-8-2 / 10-3-8-1.5)"},"다키 유기액비 2호":{"ja":"多木有機液肥2号","spec":"8-3-5 (아미노산 약 6%)"},"마이크로커스텀":{"ja":"マイクロカスタム","spec":"0-15-15-5 (추정)"},"나이스터치":{"ja":"ナイスタッチ","spec":"미확인 (현행 카탈로그 미수록)"},"그린스테이지30":{"ja":"グリーンステージ30","spec":"10-10-10-2, Mn 0.5"},"터프스파이스838":{"ja":"ターフスパイス838","spec":"8-3-8, 유기 40%"}},"total":25287.5}</script>
+<script>
+(function () {
+  const D = JSON.parse(document.getElementById("data").textContent);
+  const ZONES = { "그린": { k: "g", c: "var(--green)", a: "eg" }, "티": { k: "t", c: "var(--tee)", a: "et" }, "페어웨이": { k: "f", c: "var(--fw)", a: "ef" } };
+  const COURSES = ["밸리", "레이크", "마운틴"];
+  const WD = ["일", "월", "화", "수", "목", "금", "토"];
+  const PCOL = { "마이크로파워V": "var(--green)", "다키 유기액비 2호": "var(--water)", "마이크로커스텀": "var(--tee)",
+    "나이스터치": "var(--muted)", "그린스테이지30": "var(--tee)", "터프스파이스838": "var(--fw)" };
+  const NPROD = new Set(["마이크로파워V", "다키 유기액비 2호", "그린스테이지30", "터프스파이스838"]);
+
+  // Extra Taki products for disease and stress response
+  const XP = {
+    "카리샷": { ja: "カリショット", spec: "1-4-18, 붕소 0.05", how: "50배 이상 희석 분무. 라임샷과 혼용 금지", use: "고온·건조·일조 부족 스트레스, 칼리 보강" },
+    "아미샤워": { ja: "アミシャワー", spec: "8-3-5, 아미노산 12.5%", how: "50배 이상 희석, 300~1,000 cc/m²", use: "장마·한여름 그린 스트레스 내성 (벤트 1회 3~8 g/m²)" },
+    "마이크로마그호스": { ja: "マイクロマグホス", spec: "0-17-0-3.5", how: "세립 입제, 벤트 40~60 g/m²", use: "장마철·갱신 작업 때 뿌리 회복" },
+    "다키 PK액비": { ja: "タキPK液肥", spec: "인산칼리 + 아인산 (수치 미확인)", how: "희석배수는 제품 라벨 확인", use: "웃자람 억제, 아인산은 피시움 억제 효과로 알려짐" },
+    "터프겐": { ja: "タフゲン", spec: "규산칼리 (수치 미확인)", how: "강알칼리 — 다른 액비와 혼용 금지, 단독 살포", use: "식물체를 튼튼하게 해 병 저항성 향상" },
+    "라임샷": { ja: "ライムショット", spec: "칼슘 10, 고토 1, 붕소·망간 0.5", how: "100배 이상 희석. 카리샷·복합액비와 혼용 금지", use: "칼슘 보충, 웃자람 억제" },
+    "다키 유기액비 2호": { ja: "多木有機液肥2号", spec: "8-3-5", how: "50배 이상 희석, 100~200 cc/m²", use: "소량 질소 보충" },
+  };
+
+  // Diseases (예시 프로토콜, 2027 평년 기준 위험기)
+  const DZ = {
+    dollar: { name: "동전마름병", zones: ["그린"], win: [["2027-05-15", "2027-09-30"]], nf: 1.15, risk: ["shade", "dry"],
+      when: "5월 중순~9월. 낮 20~30℃에 이슬이 오래 남을 때", sign: "그린에 동전 크기의 탈색 반점",
+      fert: "질소가 부족하면 심해집니다. 위험기 그린 질소 비료를 15% 늘리고 액비를 소량 추가합니다.",
+      chem: "잔디용 등록 약제를 라벨대로 쓰고 계열을 바꿔 가며 살포. 새벽 이슬 털기와 아침 관수가 도움이 됩니다.",
+      extra: [["2027-06-19", "그린", "다키 유기액비 2호", 5], ["2027-09-11", "그린", "다키 유기액비 2호", 5]] },
+    brown: { name: "갈색퍼짐병", zones: ["그린"], win: [["2027-06-20", "2027-08-31"]], nf: 0.7, risk: ["wetG", "shade"],
+      when: "장마~늦여름. 밤 기온 20℃ 이상의 고온다습기", sign: "황갈색 원형 패치, 아침에 가장자리 연기 같은 고리",
+      fert: "질소가 많으면 심해집니다. 위험기 그린 질소를 30% 줄이고 칼리와 아미노산으로 버티게 합니다.",
+      chem: "잔디용 등록 약제. 저녁 관수를 피하고 통풍·배수를 개선합니다.",
+      extra: [["2027-06-26", "그린", "카리샷", 3], ["2027-07-10", "그린", "카리샷", 3], ["2027-07-24", "그린", "카리샷", 3], ["2027-08-12", "그린", "아미샤워", 5]] },
+    pythium: { name: "피시움마름병", zones: ["그린"], win: [["2027-07-01", "2027-08-25"]], nf: 0.6, risk: ["wetG", "shade"],
+      when: "장마 뒤 고온다습. 밤 기온 20℃ 이상이 이어질 때", sign: "기름에 젖은 듯한 검은 반점, 아침 솜털 균사, 배수 길을 따라 번짐",
+      fert: "질소 과다가 피해를 키웁니다. 위험기 그린 질소를 40% 줄이고, 장마 전에 뿌리를 보강합니다.",
+      chem: "피시움(난균류) 전용 등록 약제. 하루이틀 만에 번지므로 위험 홀은 예방 살포를 검토하세요. 배수가 가장 중요합니다.",
+      extra: [["2027-06-28", "그린", "마이크로마그호스", 40], ["2027-07-05", "그린", "다키 PK액비", null], ["2027-07-19", "그린", "다키 PK액비", null], ["2027-08-02", "그린", "다키 PK액비", null]] },
+    anthrac: { name: "탄저병", zones: ["그린"], win: [["2027-07-01", "2027-08-31"]], nf: 0.8, risk: ["dry"],
+      when: "한여름 고온·건조, 낮은 예고와 답압 스트레스", sign: "노랗게 시드는 불규칙 패치, 줄기 아래 검은 반점",
+      fert: "질소 부족과 스트레스가 겹치면 심해집니다. 입제는 20% 줄이고 액비를 소량씩 자주 줍니다.",
+      chem: "잔디용 등록 약제 예방 살포. 예고를 올리고 롤링·답압을 줄입니다.",
+      extra: [["2027-07-06", "그린", "다키 유기액비 2호", 3], ["2027-07-13", "그린", "다키 유기액비 2호", 3], ["2027-07-20", "그린", "카리샷", 3], ["2027-07-27", "그린", "다키 유기액비 2호", 3], ["2027-08-10", "그린", "다키 유기액비 2호", 3], ["2027-08-24", "그린", "다키 유기액비 2호", 3]] },
+    large: { name: "라지패치", zones: ["티", "페어웨이"], win: [["2027-04-15", "2027-06-15"], ["2027-09-01", "2027-10-20"]], nf: 0.5, risk: ["wetF", "slopeF"],
+      when: "봄 4~6월과 가을 9~10월. 15~20℃에 습할 때", sign: "지름 수 m까지 커지는 갈색 원형 패치, 가장자리 주황빛",
+      fert: "중지의 대표 병입니다. 질소가 많고 배수가 나쁘면 심해집니다. 위험기 질소를 50% 줄이고 발병 부위는 시비를 멈춥니다.",
+      chem: "잔디용 등록 약제. 가을 예방 살포가 이듬해 봄 피해를 줄입니다. 대치 제거와 배수 개선을 함께 하세요.",
+      extra: [["2027-05-10", "페어웨이", "터프겐", null], ["2027-09-15", "페어웨이", "터프겐", null]] },
+    rust: { name: "녹병", zones: ["티", "페어웨이"], win: [["2027-09-01", "2027-10-31"]], nf: 1, risk: ["shade"],
+      when: "가을. 생장이 느려지고 질소가 부족할 때", sign: "잎에 주황색 가루(포자)가 묻어남",
+      fert: "질소가 부족하면 생깁니다. 9월 하순에 액비로 질소를 가볍게 보충합니다.",
+      chem: "심하면 등록 약제. 예초로 병든 잎을 걷어 냅니다.",
+      extra: [["2027-09-20", "티", "다키 유기액비 2호", 5], ["2027-09-20", "페어웨이", "다키 유기액비 2호", 5]] },
+  };
+  const RISK_TXT = { wetG: "물가 그린", wetF: "물가 페어웨이", shade: "숲 그늘", dry: "건조하기 쉬운 그린", slopeF: "경사 페어웨이" };
+
+  // Hole features from round reviews (도식용)
+  const F = {
+    "밸리1": { tee: "down", ob: "R", b: [[.55, "L"]] },
+    "밸리2": { w: [["cross", .7]], b: [[.62, "R"]] },
+    "밸리3": { dl: "L", b: [[.45, "R"]], w: [["gside", "L"]] },
+    "밸리4": {},
+    "밸리5": { up: true, b: [[.45, "L"]] },
+    "밸리6": { tee: "down", b: [[.55, "L"]] },
+    "밸리7": { gslope: "L" },
+    "밸리8": {},
+    "밸리9": { b: [[.6, "L"]] },
+    "레이크1": { tee: "down", ob: "R" },
+    "레이크2": { b: [[.63, "L"], [1, "F"]] },
+    "레이크3": {},
+    "레이크4": { dl: "R", w: [["cross", .62]] },
+    "레이크5": { fwslope: "L" },
+    "레이크6": { ridge: "L" },
+    "레이크7": { b: [[.55, "R"]] },
+    "레이크8": {},
+    "레이크9": { w: [["island"]] },
+    "마운틴1": { raised: true },
+    "마운틴2": { tee: "down", b: [[1, "R"]] },
+    "마운틴3": { split: true, up: true, b: [[1, "R"]] },
+    "마운틴4": { dlx: true },
+    "마운틴5": {},
+    "마운틴6": { tee: "down", b: [[.55, "L"], [1, "F"]] },
+    "마운틴7": { dl: "R", forest: "R", w: [["front"]] },
+    "마운틴8": { up: true, b: [[.45, "R"], [.5, "L"]] },
+    "마운틴9": { dl: "L", fwslope: "L", b: [[.62, "C"]] },
+  };
+  const tagsOf = h => {
+    const f = F[h.c + h.n] || {}, w = (f.w || []).map(x => x[0]);
+    return {
+      wetG: w.some(t => t === "gside" || t === "front" || t === "island"),
+      wetF: w.some(t => t === "cross"),
+      shade: !!f.forest, dry: !!(f.raised || f.gslope), slopeF: !!(f.fwslope || f.tee === "down"),
+    };
+  };
+  const featText = h => {
+    const f = F[h.c + h.n] || {}, out = [];
+    if (f.dl) out.push(f.dl === "L" ? "좌 도그레그" : "우 도그레그");
+    if (f.dlx) out.push("도그레그");
+    if (f.tee === "down") out.push("내리막 티샷");
+    if (f.up) out.push("그린까지 오르막");
+    (f.w || []).forEach(([t, s]) => out.push({ cross: "페어웨이를 가로지르는 물", gside: "그린 왼쪽 개울", front: "그린 앞 연못", island: "물에 둘러싸인 그린" }[t]));
+    if (f.b && f.b.length) out.push(`벙커 ${f.b.length}`);
+    if (f.forest) out.push("오른쪽 숲");
+    if (f.ob) out.push("오른쪽 OB");
+    if (f.raised) out.push("솟은 그린");
+    if (f.gslope) out.push("왼쪽으로 기운 그린");
+    if (f.fwslope) out.push("왼쪽으로 기운 페어웨이");
+    if (f.ridge) out.push("왼쪽 능선");
+    if (f.split) out.push("페어웨이 중간 단절");
+    return out.join(" · ");
+  };
+
+  const st = { month: 0, ev: null, course: "밸리", dz: null };
+  try { const c = localStorage.getItem("tp-course"); if (COURSES.includes(c)) st.course = c; } catch (e) {}
+
+  const parse = s => { const [y, m, d] = s.split("-").map(Number); return { y, m, d, t: Date.UTC(y, m - 1, d) }; };
+  const doy = s => (parse(s).t - Date.UTC(2027, 0, 1)) / 864e5;
+  const md = s => { const p = parse(s); return `${p.m}월 ${p.d}일 (${WD[new Date(p.t).getUTCDay()]})`; };
+  const mdShort = s => { const p = parse(s); return `${p.m}/${p.d}`; };
+  const kg = v => v >= 100 ? Math.round(v).toLocaleString("ko-KR") : (Math.round(v * 10) / 10).toLocaleString("ko-KR", { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const sum = a => a.reduce((x, y) => x + y, 0);
+  D.events.forEach((e, i) => { e.i = i; e.m = parse(e.d).m; e.doy = doy(e.d); });
+  const holeIdx = (c, n) => COURSES.indexOf(c) * 9 + (n - 1);
+  const inWin = (dz, d) => dz.win.some(([a, b]) => d >= a && d <= b);
+  const riskOf = (dz, h) => { const t = tagsOf(h); return dz.risk.filter(r => t[r]).map(r => RISK_TXT[r]); };
+
+  let EV = [];
+  function buildEvents() {
+    const dz = st.dz ? DZ[st.dz] : null;
+    const base = D.events.map(e => {
+      const f = dz && dz.zones.includes(e.z) && NPROD.has(e.p) && inWin(dz, e.d) ? dz.nf : 1;
+      return Object.assign({}, e, { id: "b" + e.i, f, rateA: Math.round(e.rate * f * 10) / 10, kgA: e.kg * f, perA: e.per.map(v => v * f), x: false });
+    });
+    const ex = dz ? dz.extra.map(([d, z, p, rate], j) => {
+      const per = D.holes.map(h => rate ? rate * h[ZONES[z].a] / 1000 : 0);
+      const k = sum(per);
+      return { id: "x" + j, d, z, p, ja: XP[p].ja, spec: XP[p].spec, rate, rateA: rate, kg: k, kgA: k, per, perA: per, f: 1, x: true,
+        how: XP[p].how, warn: "", m: parse(d).m, doy: doy(d), bags: Math.round(k / 20 * 10) / 10 };
+    }) : [];
+    EV = base.concat(ex).sort((a, b) => a.doy - b.doy || (a.x - b.x));
+  }
+  const filtered = () => EV.filter(e => (st.ev === null ? (st.month === 0 || e.m === st.month) : e.id === st.ev));
+  const evById = id => EV.find(e => e.id === id);
+
+  // stats (base plan)
+  const msv = k => Object.entries(D.ms).find(([a]) => a.startsWith(k))[1];
+  const gStart = msv("그린 시비 시작"), gStop = msv("그린 입제 중단"), hS = msv("고온기 입제 휴지 시작"), hE = msv("고온기 입제 휴지 끝");
+  const tS = msv("중지(티) 생육기 시작"), tE = msv("중지(티) 생육기 끝");
+  const baseTotal = sum(D.events.map(e => sum(e.per)));
+  document.getElementById("stats").innerHTML = [
+    [`${(baseTotal / 1000).toFixed(1)} t`, "연간 총 사용량"],
+    [Math.round(baseTotal / 20).toLocaleString("ko-KR"), "20kg 포대 환산"],
+    [D.events.length, "시비 회차"],
+    [`${mdShort(gStart)}–${mdShort(gStop)}`, "그린 시비 기간"],
+    [`${mdShort(hS)}–${mdShort(hE)}`, "고온기 그린 입제 휴지"],
+  ].map(([b, s]) => `<div class="stat"><b>${b}</b><span>${s}</span></div>`).join("");
+
+  function stripHTML() {
+    const tm = D.temps.tmean, lo = -6, hi = 28;
+    const y = v => (40 - (v - lo) / (hi - lo) * 38).toFixed(2);
+    const pts = tm.map((v, i) => `${i},${y(v)}`).join(" ");
+    const hs = doy(hS), he = doy(hE);
+    let sel = "";
+    if (st.month) {
+      const a = doy(`2027-${String(st.month).padStart(2, "0")}-01`);
+      const b = st.month === 12 ? 365 : doy(`2027-${String(st.month + 1).padStart(2, "0")}-01`);
+      sel = `<rect class="sel" x="${a}" y="0" width="${b - a}" height="42"></rect>`;
+    }
+    const temp = `<div class="lane"><span>평균기온</span><div class="track temp"><svg viewBox="0 0 365 42" preserveAspectRatio="none" aria-label="2027 평년 일평균기온 곡선, 최저 약 −4℃, 최고 약 25℃">
+      ${sel}<rect class="heat" x="${hs}" y="0" width="${he - hs + 1}" height="42"></rect>
+      <line class="zero" x1="0" x2="365" y1="${y(0)}" y2="${y(0)}"></line><polyline class="line" points="${pts}"></polyline></svg></div></div>`;
+    let risk = "";
+    if (st.dz) {
+      const dz = DZ[st.dz];
+      const bands = dz.win.map(([a, b]) => `<div class="band" style="left:${doy(a) / 365 * 100}%;width:${(doy(b) - doy(a) + 1) / 365 * 100}%"></div>`).join("");
+      risk = `<div class="lane"><span>${esc(dz.name)}</span><div class="track riskt">${bands}</div></div>`;
+    }
+    const active = new Set(filtered().map(e => e.id));
+    const lanes = Object.keys(ZONES).map(z => {
+      const seen = {};
+      const dots = EV.filter(e => e.z === z).map(e => {
+        const size = e.kgA ? Math.max(10, Math.min(22, 8 + Math.sqrt(e.kgA) / 5)) : 10;
+        const off = seen[e.d] ? 7 : 0; seen[e.d] = 1;
+        const lab = md(e.d) + " · " + e.p + (e.rateA ? " " + e.rateA + " g/m² · 코스 전체 " + kg(e.kgA) + " kg" : " · 사용량은 라벨 확인");
+        return `<button class="dot${e.x ? " xtra" : ""}${active.has(e.id) ? "" : " dim"}" data-ev="${e.id}" aria-pressed="${st.ev === e.id}" style="--c:${ZONES[z].c};left:${(e.doy + .5) / 365 * 100}%;width:${size}px;height:${size}px;margin-top:${off}px" title="${esc(lab)}" aria-label="${esc(md(e.d) + " " + z + " " + e.p)}"></button>`;
+      }).join("");
+      return `<div class="lane"><span>${z}</span><div class="track">${dots}</div></div>`;
+    }).join("");
+    const months = `<div class="lane"><span></span><div class="months">${Array.from({ length: 12 }, (_, i) => `<button type="button" data-m="${i + 1}" aria-pressed="${st.month === i + 1}">${i + 1}월</button>`).join("")}</div></div>`;
+    const keys = `<div class="keys"><span><i style="--c:var(--green)"></i>그린(벤트)</span><span><i style="--c:var(--tee)"></i>티(중지)</span><span><i style="--c:var(--fw)"></i>페어웨이(중지)</span>${st.dz ? `<span><i class="xk" style="--c:var(--risk)"></i>병해 대응 추가</span>` : ""}<span><i class="hz"></i>고온기 ${mdShort(hS)}–${mdShort(hE)}: 그린은 액비만</span><span>중지 생육기 ${mdShort(tS)}–${mdShort(tE)}</span><span>점 크기 = 코스 전체 사용량</span></div>`;
+    return temp + risk + lanes + months + keys;
+  }
+
+  function renderDisease() {
+    document.getElementById("dzs").innerHTML = `<button type="button" data-dz="" aria-pressed="${!st.dz}">병해 없음 (기본 계획)</button>` +
+      `<span class="grp">그린</span>` + ["dollar", "brown", "pythium", "anthrac"].map(k => `<button type="button" data-dz="${k}" aria-pressed="${st.dz === k}">${DZ[k].name}</button>`).join("") +
+      `<span class="grp">티·페어웨이</span>` + ["large", "rust"].map(k => `<button type="button" data-dz="${k}" aria-pressed="${st.dz === k}">${DZ[k].name}</button>`).join("");
+    const box = document.getElementById("dzp");
+    if (!st.dz) {
+      box.innerHTML = `<p class="sub" style="margin:0">병을 고르면 위험기에 맞춰 시비량을 조정하고, 추가로 쓸 다키 제품 일정과 위험이 큰 홀을 함께 보여 줍니다. 확진은 샘플 진단으로 하세요.</p>`;
+      return;
+    }
+    const dz = DZ[st.dz];
+    const adj = sum(EV.map(e => e.kgA)), diff = adj - baseTotal;
+    const prods = [...new Set(dz.extra.map(x => x[2]))].map(p => `<li><b>${esc(p)}</b> <span class="ja">${esc(XP[p].ja)}</span> — ${esc(XP[p].use)}. ${esc(XP[p].how)}.</li>`).join("");
+    const riskHoles = D.holes.map(h => ({ h, r: riskOf(dz, h) })).filter(x => x.r.length)
+      .map(x => `<button type="button" class="rh" data-c="${x.h.c}">${x.h.c} ${x.h.n} <small>${x.r.join(", ")}</small></button>`).join("");
+    const nTxt = dz.nf === 1 ? "기본량 유지" : `질소 비료 ×${dz.nf} (${dz.nf > 1 ? "+" : ""}${Math.round((dz.nf - 1) * 100)}%)`;
+    box.innerHTML = `<div class="dzhead"><h3>${esc(dz.name)}</h3><span>${dz.zones.join("·")} · 위험기 ${dz.win.map(([a, b]) => mdShort(a) + "–" + mdShort(b)).join(", ")} · ${nTxt}</span></div>
+      <dl class="dzdl">
+        <dt>언제</dt><dd>${esc(dz.when)}</dd>
+        <dt>증상</dt><dd>${esc(dz.sign)}</dd>
+        <dt>비료 대응</dt><dd>${esc(dz.fert)}</dd>
+        <dt>약제·관리</dt><dd>${esc(dz.chem)}</dd>
+      </dl>
+      <div><h4>추가 제품</h4><ul class="xps">${prods}</ul></div>
+      <div><h4>위험이 큰 홀 <small>홀 특징 기준 추정</small></h4><div class="rhs">${riskHoles || `<span class="sub">해당 특징이 있는 홀이 없습니다.</span>`}</div></div>
+      <p class="sub" style="margin:0">조정 후 연간 ${kg(adj)} kg (기본 계획 대비 ${diff >= 0 ? "+" : "−"}${kg(Math.abs(diff))} kg). 사용량을 알 수 없는 제품은 합계에서 빠집니다.</p>`;
+  }
+
+  function renderBar() {
+    const sel = document.getElementById("period");
+    if (!sel.options.length) {
+      sel.innerHTML = `<option value="0">연간 전체</option>` + Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}월</option>`).join("");
+    }
+    sel.value = String(st.month);
+    const f = filtered();
+    document.getElementById("tabs").innerHTML = COURSES.map(c => {
+      const ci = COURSES.indexOf(c);
+      const s = sum(f.map(e => sum(e.perA.slice(ci * 9, ci * 9 + 9))));
+      return `<button type="button" data-c="${c}" aria-pressed="${st.course === c}">${c} <span class="num">${kg(s)}</span></button>`;
+    }).join("");
+    document.getElementById("clear").hidden = st.ev === null;
+    const e = st.ev === null ? null : evById(st.ev);
+    const scopeTxt = e ? `${md(e.d)} · ${e.z} ${e.p}` : (st.month ? `${st.month}월 전체` : "연간 전체");
+    document.getElementById("scope").innerHTML = `보는 범위 <b>${esc(scopeTxt)}</b>${st.dz ? ` · 병해 <b class="rk">${esc(DZ[st.dz].name)}</b>` : ""} · 단위 kg`;
+  }
+
+  function evRow(e) {
+    const rate = e.rateA == null ? "라벨 확인" : (e.f !== 1 ? `<s>${e.rate}</s> → ${e.rateA} g/m²` : `${e.rateA} g/m²`);
+    const tag = e.x ? `<span class="pill add">추가</span>` : "";
+    const chg = e.f !== 1 ? `<span class="chg">${DZ[st.dz].name} 위험기 질소 ×${e.f}</span>` : "";
+    return `<button type="button" class="ev${e.x ? " xev" : ""}" data-ev="${e.id}" aria-pressed="${st.ev === e.id}" style="--c:${ZONES[e.z].c}">
+      <span class="dt">${md(e.d)}</span>
+      <span class="pr"><span class="pill" style="--c:${ZONES[e.z].c}">${e.z}</span>${tag}${esc(e.p)} <small>${esc(e.ja)} · ${rate}</small></span>
+      <span class="kg">${e.rateA == null ? "–" : kg(e.kgA) + " kg"}<small>${e.rateA == null ? "" : (e.kgA / 20).toFixed(1) + " 포대"}</small></span>
+      ${chg}${e.warn ? `<span class="warn">${esc(e.warn)}</span>` : ""}</button>`;
+  }
+
+  function renderEvents() {
+    const box = document.getElementById("evs");
+    if (st.month === 0 && st.ev === null) {
+      const rows = Array.from({ length: 12 }, (_, i) => {
+        const es = EV.filter(e => e.m === i + 1);
+        const s = sum(es.map(e => e.kgA));
+        const zs = [...new Set(es.map(e => e.z))].map(z => `<span class="pill" style="--c:${ZONES[z].c}">${z}</span>`).join("");
+        const nx = es.filter(e => e.x).length;
+        return `<button type="button" class="ev mrow" data-m="${i + 1}"><span class="dt">${i + 1}월</span><span class="pr">${es.length ? zs + `<small>${es.length}회${nx ? ` (추가 ${nx})` : ""}</small>` : `<small>시비 없음</small>`}</span><span class="kg">${es.length ? kg(s) + " kg" : "–"}<small>${es.length ? (s / 20).toFixed(1) + " 포대" : ""}</small></span></button>`;
+      }).join("");
+      box.innerHTML = `<p class="sub" style="margin:0">월을 누르면 그 달의 회차와 홀별 사용량이 나옵니다.</p>` + rows;
+      return;
+    }
+    const f = st.ev === null ? filtered() : EV.filter(e => st.month === 0 || e.m === st.month);
+    if (!f.length) { box.innerHTML = `<p class="empty">${st.month}월에는 시비가 없습니다. 잔디가 휴면하는 시기입니다.</p>`; return; }
+    box.innerHTML = f.map(evRow).join("");
+  }
+
+  // Schematic hole drawing (top view, tee on the left; "left" of the golfer is up)
+  function holeSVG(h, on) {
+    const f = F[h.c + h.n] || {};
+    const W = 300, H = 76, cy = 38, x0 = 24, sc = 244 / 540;
+    const X = fr => x0 + h.dist * fr * sc;
+    const gx = Math.min(W - 20, X(1));
+    const gy = cy + (f.dl === "L" ? -15 : f.dl === "R" ? 15 : 0);
+    const bend = .58, bx = X(bend);
+    const Y = fr => fr <= bend ? cy : cy + (gy - cy) * Math.min(1, (fr - bend) / (1 - bend));
+    let s = `<rect class="rough" x="2" y="4" width="${W - 4}" height="${H - 8}" rx="14"></rect>`;
+    if (f.forest) for (let x = bx - 30; x < gx - 10; x += 11) s += `<circle class="tree" cx="${x}" cy="${H - 12}" r="5"></circle>`;
+    if (f.ob) s += `<line class="ob" x1="30" y1="${H - 6}" x2="${gx + 10}" y2="${H - 6}"></line><text x="${gx + 14}" y="${H - 3}" class="svgt obt">OB</text>`;
+    if ((f.w || []).some(w => w[0] === "island")) s += `<ellipse class="wtr" cx="${gx - 2}" cy="${gy}" rx="26" ry="19"></ellipse>`;
+    if (h.par > 3) {
+      const fs = X(Math.min(.35, 110 / h.dist)), fe = gx - 17;
+      const pts = f.dl ? `M${fs} ${cy} L${bx} ${cy} L${fe} ${gy}` : `M${fs} ${cy} L${fe} ${gy}`;
+      if (f.split) {
+        const m1 = fs + (fe - fs) * .45, m2 = fs + (fe - fs) * .58;
+        s += `<path class="fwp${on.f ? " on" : ""}" d="M${fs} ${cy} L${m1} ${cy}"></path><path class="fwp${on.f ? " on" : ""}" d="M${m2} ${cy} L${fe} ${gy}"></path>`;
+        s += `<path class="fws" d="M${fs} ${cy} L${m1} ${cy}"></path><path class="fws" d="M${m2} ${cy} L${fe} ${gy}"></path>`;
+      } else {
+        s += `<path class="fwp${on.f ? " on" : ""}" d="${pts}"></path><path class="fws" d="${pts}"></path>`;
+      }
+    } else {
+      s += `<rect class="z f${on.f ? " on" : ""}" x="${gx - 38}" y="${gy - 8}" width="22" height="16" rx="8"></rect>`;
+    }
+    (f.w || []).forEach(([t, v]) => {
+      if (t === "cross") s += `<rect class="wtr" x="${X(v) - 5}" y="10" width="10" height="${H - 20}" rx="5"></rect>`;
+      if (t === "gside") s += `<ellipse class="wtr" cx="${gx - 4}" cy="${gy - 18}" rx="20" ry="5"></ellipse>`;
+      if (t === "front") s += `<ellipse class="wtr" cx="${gx - 27}" cy="${gy}" rx="7" ry="12"></ellipse>`;
+    });
+    (f.b || []).forEach(([fr, side]) => {
+      let bxp, byp;
+      if (side === "F") { bxp = gx - 22; byp = gy + 9; }
+      else if (fr >= 1) { bxp = gx + (side === "R" ? 4 : -4); byp = gy + (side === "R" ? 16 : -16); }
+      else { bxp = X(fr); byp = Y(fr) + (side === "L" ? -15 : side === "R" ? 15 : 0); }
+      s += `<ellipse class="sand" cx="${bxp}" cy="${byp}" rx="7" ry="4"></ellipse>`;
+    });
+    s += `<rect class="z t${on.t ? " on" : ""}" x="7" y="${cy - 7}" width="14" height="14" rx="3"></rect>`;
+    if (f.raised) s += `<ellipse class="raise" cx="${gx}" cy="${gy}" rx="20" ry="16"></ellipse>`;
+    s += `<ellipse class="z g${on.g ? " on" : ""}" cx="${gx}" cy="${gy}" rx="15" ry="11"></ellipse>`;
+    s += `<text x="${gx}" y="${gy + 4}" text-anchor="middle" class="svgt gt">${h.dist}</text>`;
+    if (f.tee === "down" || f.up) s += `<text x="10" y="16" class="svgt">${f.tee === "down" ? "▼ 내리막" : "▲ 오르막"}</text>`;
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${h.c} ${h.n}번 홀 도식: ${esc(featText(h) || "특징 정보 없음")}">${s}</svg>`;
+  }
+
+  function renderHoles() {
+    const f = filtered();
+    const ci = COURSES.indexOf(st.course);
+    const dz = st.dz ? DZ[st.dz] : null;
+    const csum = sum(f.map(e => sum(e.perA.slice(ci * 9, ci * 9 + 9))));
+    const sel = st.ev === null ? null : evById(st.ev);
+    document.getElementById("holes-sub").textContent = `${st.course} 코스 9홀 · ${sel ? md(sel.d) : (st.month ? st.month + "월" : "연간")} 합계 ${kg(csum)} kg. 색이 칠해진 구역이 이 기간에 시비하는 곳입니다.`;
+    document.getElementById("holes").innerHTML = D.holes.filter(h => h.c === st.course).map(h => {
+      const hi = holeIdx(h.c, h.n);
+      const on = { g: false, t: false, f: false };
+      const byProd = {};
+      let tot = 0, label = false;
+      f.forEach(e => {
+        const v = e.perA[hi];
+        if (v > 0 || (e.x && e.rateA == null)) {
+          on[ZONES[e.z].k] = true;
+          const key = e.z + "|" + e.p;
+          if (v > 0) { byProd[key] = (byProd[key] || 0) + v; tot += v; }
+          else { byProd[key] = byProd[key] || 0; label = true; }
+        }
+      });
+      const lines = Object.entries(byProd).map(([k, v]) => {
+        const [z, p] = k.split("|");
+        return `<li style="--c:${ZONES[z].c}"><i></i><span class="lb">${z} · ${esc(p)}</span><span class="v">${v > 0 ? kg(v) + " kg" : "라벨 확인"}</span></li>`;
+      }).join("");
+      const rows = EV.filter(e => e.perA[hi] > 0 || (e.x && e.rateA == null)).map(e => `<tr${e.x ? ' class="xr"' : ""}><td>${mdShort(e.d)}</td><td>${e.z}</td><td>${esc(e.p)}</td><td class="r">${e.rateA == null ? "–" : e.rateA}</td><td class="r">${e.rateA == null ? "–" : kg(e.perA[hi])}</td></tr>`).join("");
+      const yr = sum(EV.map(e => e.perA[hi]));
+      const tags = [h.wg ? "물가 그린" : "", h.wf ? "물가 페어웨이" : "", h.par === 3 ? "파3 티 +25%" : ""].filter(Boolean).map(t => `<span class="chip"${t.startsWith("파3") ? ' style="color:var(--tee);border-color:var(--tee)"' : ""}>${t}</span>`).join("");
+      const risk = dz ? riskOf(dz, h) : [];
+      const riskChip = risk.length ? `<span class="chip risk">${esc(dz.name)} 위험 · ${esc(risk.join(", "))}</span>` : "";
+      const ft = featText(h);
+      return `<article class="hole${risk.length ? " atrisk" : ""}" aria-label="${h.c} ${h.n}번 홀">
+        <header><span class="no">${h.n}</span><span class="meta"><b>파${h.par}</b> · 블랙 ${h.dist} m</span>${tags}${riskChip}</header>
+        ${holeSVG(h, on)}
+        <p class="feat">${ft ? esc(ft) : "공개된 특징 정보 없음"}</p>
+        ${lines ? `<ul class="amts">${lines}</ul>` : `<p class="empty" style="margin:0">이 기간에는 시비하지 않습니다.</p>`}
+        <div class="tot"><span>이 홀 합계${label ? " (라벨 확인 제품 제외)" : ""}</span><b>${kg(tot)} kg</b></div>
+        <details><summary>홀 상세 · 연간 ${kg(yr)} kg</summary>
+          <p class="note">${esc(h.note)}</p>
+          <dl><dt>그린</dt><dd>${h.eg.toLocaleString("ko-KR")} m²</dd><dt>티</dt><dd>${h.et.toLocaleString("ko-KR")} m²</dd><dt>페어웨이</dt><dd>${h.ef.toLocaleString("ko-KR")} m²</dd></dl>
+          <div class="tbl"><table><thead><tr><th>날짜</th><th>구역</th><th>제품</th><th class="r">g/m²</th><th class="r">kg</th></tr></thead><tbody>${rows}</tbody></table></div>
+        </details>
+      </article>`;
+    }).join("");
+  }
+
+  function renderProds() {
+    const how = {}, zones = {}, totals = {};
+    D.events.forEach(e => { how[e.p] = e.how; (zones[e.p] = zones[e.p] || new Set()).add(e.z); totals[e.p] = (totals[e.p] || 0) + e.kg; });
+    document.getElementById("prods").innerHTML = D.prods.map(p => `<div class="prod" style="--c:${PCOL[p]}">
+      <b>${esc(p)}</b><span class="ja">${esc(D.spec[p].ja)} · ${[...zones[p]].join("·")}</span>
+      <span>성분 ${esc(D.spec[p].spec.replace(/^성분 /, ""))}</span><span>${esc(how[p])}</span>
+      <span class="num" style="font-size:16px;font-weight:600">연간 ${kg(totals[p])} kg</span></div>`).join("");
+    const usedBy = {};
+    Object.values(DZ).forEach(dz => dz.extra.forEach(x => { (usedBy[x[2]] = usedBy[x[2]] || new Set()).add(dz.name); }));
+    document.getElementById("xprods").innerHTML = Object.entries(XP).filter(([p]) => p !== "다키 유기액비 2호").map(([p, x]) => `<div class="prod" style="--c:var(--risk)">
+      <b>${esc(p)}</b><span class="ja">${esc(x.ja)}</span>
+      <span>성분 ${esc(x.spec)}</span><span>${esc(x.use)}</span><span>${esc(x.how)}</span>
+      ${usedBy[p] ? `<span class="sub">병해 대응: ${[...usedBy[p]].join(", ")}</span>` : `<span class="sub">필요할 때 선택 사용</span>`}</div>`).join("");
+  }
+
+  function render() {
+    buildEvents();
+    document.getElementById("strip").innerHTML = stripHTML();
+    renderDisease(); renderBar(); renderEvents(); renderHoles();
+  }
+
+  document.addEventListener("click", ev => {
+    const t = ev.target.closest("[data-ev],[data-m],[data-c],[data-dz],#clear");
+    if (!t) return;
+    if (t.id === "clear") { st.ev = null; }
+    else if (t.dataset.dz !== undefined) {
+      st.dz = t.dataset.dz || null; st.ev = null;
+    } else if (t.dataset.ev !== undefined) {
+      const id = t.dataset.ev;
+      if (st.ev === id) st.ev = null; else { st.ev = id; const e = evById(id); if (e) st.month = e.m; }
+    } else if (t.dataset.m) {
+      const m = Number(t.dataset.m);
+      st.month = st.month === m ? 0 : m; st.ev = null;
+    } else if (t.dataset.c) {
+      st.course = t.dataset.c;
+      try { localStorage.setItem("tp-course", st.course); } catch (e) {}
+      if (t.classList.contains("rh")) { render(); document.getElementById("h-holes").scrollIntoView({ block: "start" }); return; }
+    }
+    render();
+  });
+  document.getElementById("period").addEventListener("change", e => { st.month = Number(e.target.value); st.ev = null; render(); });
+  renderProds(); render();
+})();
+</script>
+
+</body></html>
